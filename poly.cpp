@@ -4,6 +4,7 @@
 #include <queue>
 #include <algorithm>
 #include <random>
+#include <unordered_set>
 
 class Person
 {
@@ -36,8 +37,48 @@ public:
             women.push_back(Person(i, maxPartners));
         }
 
-        // Generate random preferences for men and women
-        generateRandomPreferences();
+        // Ask the user for preference input method
+        std::cout << "Enter preferences manually (m) or generate randomly (r)? ";
+        char choice;
+        std::cin >> choice;
+
+        if (choice == 'm')
+        {
+            // Manually enter preferences
+            enterPreferencesManually();
+        }
+        else
+        {
+            // Generate random preferences
+            generateRandomPreferences();
+        }
+    }
+
+    void enterPreferencesManually()
+    {
+        for (Person &person : men)
+        {
+            std::cout << "Enter preferences for Man " << person.id << ":\n";
+            for (Person &other : women)
+            {
+                std::cout << "Preference weight for Woman " << other.id << ": ";
+                double weight;
+                std::cin >> weight;
+                person.preferences[other.id] = weight;
+            }
+        }
+
+        for (Person &person : women)
+        {
+            std::cout << "Enter preferences for Woman " << person.id << ":\n";
+            for (Person &other : men)
+            {
+                std::cout << "Preference weight for Man " << other.id << ": ";
+                double weight;
+                std::cin >> weight;
+                person.preferences[other.id] = weight;
+            }
+        }
     }
 
     // Function to generate random preferences for men and women
@@ -72,6 +113,8 @@ public:
     void findStableMatching()
     {
         std::queue<int> freeMen;
+        std::unordered_set<int> proposalsMade;
+
         for (int i = 0; i < men.size(); ++i)
         {
             freeMen.push(i);
@@ -88,6 +131,8 @@ public:
                 continue; // Man is full, skip
             }
 
+            bool proposalMade = false;
+
             // Sort preferences based on weights in descending order
             std::vector<std::pair<int, double>> sortedPreferences(man.preferences.begin(), man.preferences.end());
             std::sort(sortedPreferences.begin(), sortedPreferences.end(),
@@ -103,34 +148,38 @@ public:
                 double weight = pref.second;
                 Person &woman = women[womanId];
 
-                // Check if woman has space for a partner
-                if (woman.partnerCounts < woman.partnerCapacity)
+                if (proposalsMade.count(womanId) == 0)
                 {
-                    // Woman has space, form a match
-                    man.partners.push_back(womanId);
-                    woman.partners.push_back(manId);
-                    man.partnerCounts++;
-                    woman.partnerCounts++;
-                    break; // Man found a match, stop proposing
-                }
-                else
-                {
-                    // Woman is full, check if she prefers the new man
-                    if (weight > woman.preferences[man.id])
+                    proposalsMade.insert(womanId);
+                    proposalMade = true;
+
+                    // Check if woman has space for a partner and if man has reached his maximum capacity
+                    if (woman.partnerCounts < woman.partnerCapacity && man.partnerCounts < man.partnerCapacity)
                     {
-                        // Woman prefers the new man, replace current partner
-                        int leastPreferredPartnerId = woman.partners[0];
-                        Person &leastPreferredPartner = men[leastPreferredPartnerId];
-                        leastPreferredPartner.partnerCounts--;
-
-                        woman.partners[0] = manId;
+                        // Woman has space and man has not reached his maximum capacity, form a match
                         man.partners.push_back(womanId);
+                        woman.partners.push_back(manId);
                         man.partnerCounts++;
-
-                        freeMen.push(leastPreferredPartnerId); // Add the replaced man back
-                        break; // Man found a match, stop proposing
+                        woman.partnerCounts++;
+                    }
+                    else
+                    {
+                        // Either woman is full or man has reached his maximum capacity, skip
+                        continue;
                     }
                 }
+
+                // Stop proposing if man has reached his maximum capacity
+                if (man.partnerCounts >= man.partnerCapacity)
+                {
+                    break;
+                }
+            }
+
+            if (!proposalMade)
+            {
+                // Man made all possible proposals without success
+                break;
             }
         }
     }
