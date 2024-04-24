@@ -23,7 +23,7 @@ class PolygamousStableMarriage
 public:
     std::vector<Person> men;
     std::vector<Person> women;
-    int maxPartners;                                   // Maximum number of partners allowed
+    int maxPartners; // Maximum number of partners allowed
 
     PolygamousStableMarriage(int numMen, int numWomen, int maxPartners)
     {
@@ -94,6 +94,9 @@ public:
             {
                 double weight = std::uniform_real_distribution<>(0.0, 1.0)(g);
                 man.preferences[woman.id] = weight;
+
+                // Print the generated preference
+                std::cout << "Man " << man.id << " preference for Woman " << woman.id << ": " << weight << std::endl;
             }
         }
 
@@ -105,6 +108,9 @@ public:
             {
                 double weight = std::uniform_real_distribution<>(0.0, 1.0)(g);
                 woman.preferences[man.id] = weight;
+
+                // Print the generated preference
+                std::cout << "Woman " << woman.id << " preference for Man " << man.id << ": " << weight << std::endl;
             }
         }
     }
