@@ -4,6 +4,7 @@
 #include <queue>
 #include <algorithm>
 #include <random>
+#include <sstream>
 using std::cout, std::cin, std::find;
 
 class PrettyPrint
@@ -654,20 +655,35 @@ public:
         std::random_device rd;
         std::mt19937 g(rd());
 
-        for (Person &man : men)
-        {
+        for (Person &man : men) {
             man.preferences.resize(women.size());
             std::iota(man.preferences.begin(), man.preferences.end(), 0);
             std::shuffle(man.preferences.begin(), man.preferences.end(), g);
+
+            // Print the generated preference order in readable format
+            std::ostringstream oss;
+            oss << "Man " << man.id << " preferences: ";
+            for (int womanId : man.preferences) {
+                oss << "Woman " << womanId << " > ";
+            }
+            cout << oss.str() << "\n";
         }
 
-        for (Person &woman : women)
-        {
+        for (Person &woman : women) {
             woman.preferences.resize(men.size());
             std::iota(woman.preferences.begin(), woman.preferences.end(), 0);
             std::shuffle(woman.preferences.begin(), woman.preferences.end(), g);
+
+            // Print the generated preference order in readable format
+            std::ostringstream oss;
+            oss << "Woman " << woman.id << " preferences: ";
+            for (int manId : woman.preferences) {
+                oss << "Man " << manId << " > ";
+            }
+            cout << oss.str() << "\n";
         }
     }
+
 
     // Function to get manual preferences from the user
     void getManualPreferences() {
@@ -830,16 +846,14 @@ int main()
     std::cin >> numWomen;
 
     // Male-optimal matching
-    StableMarriage smMale(numMen, numWomen, true);
-    smMale.findStableMatching();
+    StableMarriage sm(numMen, numWomen, true);
+    sm.findStableMatchingMaleOptimal();
     std::cout << "\nMale-Optimal Matching:\n";
-    smMale.printMatching();
+    sm.printMatching();
 
-    // Female-optimal matching
-    StableMarriage smFemale(numMen, numWomen, false);
-    smFemale.findStableMatching();
+    sm.findStableMatchingFemaleOptimal();
     std::cout << "\nFemale-Optimal Matching:\n";
-    smFemale.printMatching();
+    sm.printMatching();
 
     return 0;
 }
