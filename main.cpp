@@ -837,7 +837,6 @@ public:
 
 int main()
 {
-    // Printing Heading in different colors
     // PrettyPrintColors();
     int numMen, numWomen;
     std::cout << "Enter the number of men: ";
