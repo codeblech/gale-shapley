@@ -619,7 +619,7 @@ class PolygamousStableMarriage
 public:
     std::vector<Person> men;
     std::vector<Person> women;
-    int maxPartners;                                   // Maximum number of partners allowed
+    int maxPartners; // Maximum number of partners allowed
 
     PolygamousStableMarriage(int numMen, int numWomen, int maxPartners)
     {
@@ -706,7 +706,7 @@ public:
     }
 
     // Function to find a stable matching (adapted for polygamy and weights)
-    void findStableMatching()
+    void findMaleOptimalStableMatching()
     {
         std::queue<int> freeMen;
         std::unordered_set<int> proposalsMade;
@@ -838,7 +838,7 @@ int main()
     PolygamousStableMarriage psm(numMen, numWomen, maxPartners);
 
     // Find and print the stable matching
-    psm.findStableMatching();
+    psm.findMaleOptimalStableMatching();
     psm.printMatching();
 
     int quit;
