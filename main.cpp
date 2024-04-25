@@ -598,6 +598,7 @@ int PrettyPrintColors()
         {
         }
     }
+    std::cout << std::endl;
     return 0;
 }
 
@@ -639,11 +640,16 @@ public:
         cout << "Generate random preferences or enter manually? (r/m): ";
         cin >> choice;
 
-        if (choice == 'r') {
+        if (choice == 'r')
+        {
             generateRandomPreferences();
-        } else if (choice == 'm') {
+        }
+        else if (choice == 'm')
+        {
             getManualPreferences();
-        } else {
+        }
+        else
+        {
             cout << "Invalid choice. Using random preferences.\n";
             generateRandomPreferences();
         }
@@ -655,7 +661,8 @@ public:
         std::random_device rd;
         std::mt19937 g(rd());
 
-        for (Person &man : men) {
+        for (Person &man : men)
+        {
             man.preferences.resize(women.size());
             std::iota(man.preferences.begin(), man.preferences.end(), 0);
             std::shuffle(man.preferences.begin(), man.preferences.end(), g);
@@ -663,13 +670,15 @@ public:
             // Print the generated preference order in readable format
             std::ostringstream oss;
             oss << "Man " << man.id << " preferences: ";
-            for (int womanId : man.preferences) {
+            for (int womanId : man.preferences)
+            {
                 oss << "Woman " << womanId << " > ";
             }
             cout << oss.str() << "\n";
         }
 
-        for (Person &woman : women) {
+        for (Person &woman : women)
+        {
             woman.preferences.resize(men.size());
             std::iota(woman.preferences.begin(), woman.preferences.end(), 0);
             std::shuffle(woman.preferences.begin(), woman.preferences.end(), g);
@@ -677,37 +686,46 @@ public:
             // Print the generated preference order in readable format
             std::ostringstream oss;
             oss << "Woman " << woman.id << " preferences: ";
-            for (int manId : woman.preferences) {
+            for (int manId : woman.preferences)
+            {
                 oss << "Man " << manId << " > ";
             }
             cout << oss.str() << "\n";
         }
     }
 
-
     // Function to get manual preferences from the user
-    void getManualPreferences() {
-        for (Person &man : men) {
+    void getManualPreferences()
+    {
+        for (Person &man : men)
+        {
             cout << "Enter preferences for Man " << man.id << " (space-separated IDs): ";
             man.preferences.resize(women.size());
-            for (int &w : man.preferences) {
+            for (int &w : man.preferences)
+            {
                 cin >> w;
             }
         }
 
-        for (Person &woman : women) {
+        for (Person &woman : women)
+        {
             cout << "Enter preferences for Woman " << woman.id << " (space-separated IDs): ";
             woman.preferences.resize(men.size());
-            for (int &m : woman.preferences) {
+            for (int &m : woman.preferences)
+            {
                 cin >> m;
             }
         }
     }
 
-    void findStableMatching() {
-        if (maleOptimal) {
+    void findStableMatching()
+    {
+        if (maleOptimal)
+        {
             findStableMatchingMaleOptimal();
-        } else {
+        }
+        else
+        {
             findStableMatchingFemaleOptimal();
         }
     }
@@ -769,42 +787,53 @@ public:
         }
     }
 
-    void findStableMatchingFemaleOptimal() {
+    void findStableMatchingFemaleOptimal()
+    {
         std::queue<int> freeWomen; // Queue of women who are currently single
-        for (int i = 0; i < women.size(); ++i) {
+        for (int i = 0; i < women.size(); ++i)
+        {
             freeWomen.push(i);
         }
 
-        while (!freeWomen.empty()) {
+        while (!freeWomen.empty())
+        {
             int womanId = freeWomen.front();
             freeWomen.pop();
             Person &woman = women[womanId];
 
-            if (woman.proposalIndex >= woman.preferences.size()) {
+            if (woman.proposalIndex >= woman.preferences.size())
+            {
                 continue; // Woman has proposed to everyone, remains single
             }
 
             int manId = woman.preferences[woman.proposalIndex++];
-            if (manId >= men.size()) {
+            if (manId >= men.size())
+            {
                 continue; // Invalid preference, skip to next
             }
 
             Person &man = men[manId];
 
-            if (man.partner == -1) {
+            if (man.partner == -1)
+            {
                 man.partner = womanId;
                 woman.partner = manId;
-            } else {
+            }
+            else
+            {
                 int currentPartnerId = man.partner;
                 int currentPartnerRank = std::find(man.preferences.begin(), man.preferences.end(), currentPartnerId) - man.preferences.begin();
                 int newWomanRank = std::find(man.preferences.begin(), man.preferences.end(), womanId) - man.preferences.begin();
 
-                if (newWomanRank < currentPartnerRank) {
+                if (newWomanRank < currentPartnerRank)
+                {
                     women[currentPartnerId].partner = -1;
                     freeWomen.push(currentPartnerId);
                     man.partner = womanId;
                     woman.partner = manId;
-                } else {
+                }
+                else
+                {
                     freeWomen.push(womanId);
                 }
             }
@@ -837,7 +866,10 @@ public:
 
 int main()
 {
-    // PrettyPrintColors();
+    PrettyPrintColors();
+    // fflush(stdin);
+    // fflush(stdout);
+    // cout.flush();
     int numMen, numWomen;
     std::cout << "Enter the number of men: ";
     std::cin >> numMen;
@@ -854,5 +886,8 @@ int main()
     std::cout << "\nFemale-Optimal Matching:\n";
     sm.printMatching();
 
+    int quit;
+    std::cout << "Do you want to quit? (Enter any value to quit):";
+    std::cin >> quit;
     return 0;
 }
