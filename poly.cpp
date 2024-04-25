@@ -780,6 +780,95 @@ public:
         }
     }
 
+    void findFemaleOptimalStableMatching()
+    {
+        std::queue<int> freeWomen;
+        std::unordered_set<int> proposalsReceived;
+
+        // Initialize freeWomen queue with all women
+        for (int i = 0; i < women.size(); ++i)
+        {
+            freeWomen.push(i);
+        }
+
+        while (!freeWomen.empty())
+        {
+            int womanId = freeWomen.front();
+            freeWomen.pop();
+            Person &woman = women[womanId];
+
+            if (woman.partnerCounts >= woman.partnerCapacity)
+            {
+                continue; // Woman is full, skip
+            }
+
+            bool proposalReceived = false;
+
+            // Sort preferences based on weights in descending order (for the woman)
+            std::vector<std::pair<int, double>> sortedPreferences(woman.preferences.begin(), woman.preferences.end());
+            std::sort(sortedPreferences.begin(), sortedPreferences.end(),
+                      [](const auto &a, const auto &b)
+                      {
+                          return a.second > b.second; // Sort by weight (descending)
+                      });
+
+            // Woman proposes to men in sorted order of preference
+            for (const auto &pref : sortedPreferences)
+            {
+                int manId = pref.first;
+                double weight = pref.second;
+                Person &man = men[manId];
+
+                if (proposalsReceived.count(manId) == 0)
+                {
+                    proposalsReceived.insert(manId);
+                    proposalReceived = true;
+
+                    // Check if man has space for a partner
+                    if (man.partnerCounts < man.partnerCapacity)
+                    {
+                        // Man has space, form a tentative match
+                        man.partners.push_back(womanId);
+                        woman.partners.push_back(manId);
+                        man.partnerCounts++;
+                        woman.partnerCounts++;
+
+                        // If man is now full, remove him from the preferences of other women
+                        // who tentatively matched with him and are less preferred
+                        if (man.partnerCounts == man.partnerCapacity)
+                        {
+                            for (int i = 0; i < man.partners.size(); ++i)
+                            {
+                                int otherWomanId = man.partners[i];
+                                if (man.preferences[otherWomanId] < weight)
+                                {
+                                    women[otherWomanId].partners.erase(
+                                        std::remove(women[otherWomanId].partners.begin(),
+                                                    women[otherWomanId].partners.end(), manId),
+                                        women[otherWomanId].partners.end());
+                                    women[otherWomanId].partnerCounts--;
+                                    freeWomen.push(otherWomanId); // Add the less preferred woman back to the queue
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Woman stops proposing if she has reached her maximum capacity
+                if (woman.partnerCounts >= woman.partnerCapacity)
+                {
+                    break;
+                }
+            }
+
+            if (!proposalReceived)
+            {
+                // Woman made all possible proposals without success
+                break;
+            }
+        }
+    }
+
     void printMatching()
     {
         std::cout << "Stable Matching:\n";
@@ -838,7 +927,13 @@ int main()
     PolygamousStableMarriage psm(numMen, numWomen, maxPartners);
 
     // Find and print the stable matching
+    std::cout << "Male-Optimal Stable Matching:\n";
     psm.findMaleOptimalStableMatching();
+    psm.printMatching();
+    std::cout << std::endl;
+
+    std::cout << "Female-Optimal Stable Matching:\n";
+    psm.findFemaleOptimalStableMatching();
     psm.printMatching();
 
     int quit;
