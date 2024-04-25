@@ -531,6 +531,7 @@ void delay(int msecs)
 
 int PrettyPrintColors()
 {
+    // char s[] = "ALGORITHMS";
     PrettyPrint p("ALGORITHMS");
     delay(300);
     system("color 0A");
@@ -597,6 +598,7 @@ int PrettyPrintColors()
         {
         }
     }
+    std::cout << std::endl;
     return 0;
 }
 
@@ -617,7 +619,7 @@ class PolygamousStableMarriage
 public:
     std::vector<Person> men;
     std::vector<Person> women;
-    int maxPartners; // Maximum number of partners allowed
+    int maxPartners;                                   // Maximum number of partners allowed
 
     PolygamousStableMarriage(int numMen, int numWomen, int maxPartners)
     {
@@ -688,9 +690,6 @@ public:
             {
                 double weight = std::uniform_real_distribution<>(0.0, 1.0)(g);
                 man.preferences[woman.id] = weight;
-
-                // Print the generated preference
-                std::cout << "Man " << man.id << " preference for Woman " << woman.id << ": " << weight << std::endl;
             }
         }
 
@@ -702,9 +701,6 @@ public:
             {
                 double weight = std::uniform_real_distribution<>(0.0, 1.0)(g);
                 woman.preferences[man.id] = weight;
-
-                // Print the generated preference
-                std::cout << "Woman " << woman.id << " preference for Man " << man.id << ": " << weight << std::endl;
             }
         }
     }
@@ -828,9 +824,9 @@ public:
 
 int main()
 {
-    // PrettyPrintColors();
-    int numMen, numWomen, maxPartners;
+    PrettyPrintColors();
 
+    int numMen, numWomen, maxPartners;
     std::cout << "Enter the number of men: ";
     std::cin >> numMen;
     std::cout << "Enter the number of women: ";
@@ -845,5 +841,8 @@ int main()
     psm.findStableMatching();
     psm.printMatching();
 
+    int quit;
+    std::cout << "Do you want to quit? (Enter any value to quit):";
+    std::cin >> quit;
     return 0;
 }
