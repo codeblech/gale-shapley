@@ -18,11 +18,14 @@ double randDouble(double min, double max) {
 }
 
 int main() {
-    // Initialize the CWP matrix with random values between 0 and 100
+    // Initialize the CWP matrix with random values between lower and upper bounds
+    double lowerBound, upperBound;
+    std::cout << "Enter the lower and upper bounds for the CWP matrix(space separated) [ex: 5 90]: ";
+    std::cin >> lowerBound >> upperBound;
     vector<vector<double>> CWP(NUM_MEN, vector<double>(NUM_WOMEN));
     for (int i = 0; i < NUM_MEN; i++) {
         for (int j = 0; j < NUM_WOMEN; j++) {
-            CWP[i][j] = randDouble(0.0, 100.0);
+            CWP[i][j] = randDouble(lowerBound, upperBound);
         }
     }
 
@@ -78,8 +81,6 @@ int main() {
     }
     awm /= NUM_MEN;
 
-    cout << "Average Weighted Matching (AWM): " << awm << endl;
-
     // Print the matched pairs
     cout << "Matched Pairs:" << endl;
     for (const auto& match : matches) {
@@ -87,6 +88,7 @@ int main() {
         int womanIndex = match.second;
         cout << "Man " << manIndex << " - Woman " << womanIndex << endl;
     }
+    cout << "Average Weighted Matching (AWM): " << awm << endl;
 
     return 0;
 }
